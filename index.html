@@ -317,7 +317,7 @@
       this.tv += dir * 0.013;
       beep(dir < 0 ? 500 : 560, 0.05, "square", 0.04);
     },
-    fail(){ sfxFail(); this.tilt = 0; this.tv = 0; this.prog = Math.max(0, this.prog - 0.12); this.flash = 45; },
+    fail(){ sfxFail(); this.tilt = 0; this.tv = 0; this.prog = 0; this.flash = 45; },
     update(){
       if (this.flash > 0) this.flash--;
       this.windT += 0.02;
