@@ -324,7 +324,7 @@
       const gust = (Math.sin(this.windT) + Math.sin(this.windT*2.3+1))*0.5; // -1..1-ish
       const windScale = 0.0006 * (0.4 + 0.5*this.prog); // milder, grows only gently
       this.tv += gust * windScale;
-      this.tv += -this.tilt * 0.0008;                   // gentle self-centering (forgiving)
+      this.tv += this.tilt * 0.0004;                    // mild destabilizing — needs taps, but forgiving
       this.tv *= 0.985;
       this.tilt += this.tv;
       if (Math.abs(this.tilt) >= 1) this.fail();
