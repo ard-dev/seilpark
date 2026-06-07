@@ -18,8 +18,8 @@
     position: fixed; inset: 0; display: flex; flex-direction: column;
     align-items: center; justify-content: center; text-align: center;
     padding: 24px; z-index: 10;
-    background: radial-gradient(circle at 50% 40%, rgba(10,20,40,0.55), rgba(5,8,16,0.92));
-    transition: opacity 0.4s ease;
+    background: radial-gradient(circle at 50% 40%, rgba(10,20,40,0.55), rgba(5,8,16,0.93));
+    transition: opacity 0.35s ease;
   }
   .overlay.hidden { opacity: 0; pointer-events: none; }
 
@@ -29,24 +29,28 @@
     text-shadow: 0 0 12px #22d3ee, 0 0 34px #0891b2, 0 0 60px #155e75;
   }
   .title .small { display:block; font-size: 0.42em; letter-spacing: 8px; color:#b6f4ff; margin-bottom: 6px; text-shadow: 0 0 8px #22d3ee;}
-  .subtitle { margin-top: 18px; font-size: clamp(15px, 4.4vw, 21px); color: #9fb3d1; max-width: 520px; }
-  .hint { margin-top: 10px; font-size: clamp(13px,3.6vw,16px); color:#64748b; }
+  .subtitle { margin-top: 18px; font-size: clamp(15px, 4.4vw, 21px); color: #9fb3d1; max-width: 540px; line-height:1.45; }
+  .locks { margin-top: 16px; font-size: clamp(20px,6vw,28px); letter-spacing: 8px; }
 
   .tap-cta {
-    margin-top: 38px; font-size: clamp(16px, 5vw, 24px); font-weight: 800;
+    margin-top: 34px; font-size: clamp(16px, 5vw, 24px); font-weight: 800;
     color: #ffae5c; letter-spacing: 3px;
     text-shadow: 0 0 12px #f97316, 0 0 28px #c2410c;
     animation: pulse 1.2s ease-in-out infinite;
   }
   @keyframes pulse { 0%,100%{opacity:0.55; transform:scale(0.98);} 50%{opacity:1; transform:scale(1.04);} }
 
+  /* Intermission / challenge intro */
+  #inter .step { font-size: clamp(13px,3.8vw,16px); letter-spacing: 6px; color:#ffae5c; text-shadow:0 0 10px #f97316; }
+  #inter .ititle { margin-top: 8px; font-size: clamp(30px,9vw,60px); font-weight:900; color:#7ff7ff;
+    text-shadow: 0 0 12px #22d3ee, 0 0 34px #0891b2; line-height:1.05; }
+  #inter .isub { margin-top: 18px; font-size: clamp(15px,4.4vw,20px); color:#bcd0ea; max-width:540px; line-height:1.5; }
+
   /* Win screen */
-  #win .won { font-size: clamp(26px, 8vw, 52px); font-weight:900; color:#9bffb0;
-    text-shadow:0 0 14px #22c55e, 0 0 40px #15803d; letter-spacing:2px; }
+  #win .won { font-size: clamp(24px, 7.5vw, 50px); font-weight:900; color:#9bffb0;
+    text-shadow:0 0 14px #22c55e, 0 0 40px #15803d; letter-spacing:1px; line-height:1.1; }
   #win .lock { margin-top: 14px; font-size: clamp(14px,4vw,18px); color:#9fb3d1; letter-spacing:5px; }
-  .pin {
-    margin-top: 26px; display:flex; gap: clamp(12px,4vw,28px);
-  }
+  .pin { margin-top: 26px; display:flex; gap: clamp(12px,4vw,28px); }
   .pin .d {
     width: clamp(64px, 20vw, 110px); height: clamp(84px, 26vw, 144px);
     border-radius: 16px; display:flex; align-items:center; justify-content:center;
@@ -62,7 +66,7 @@
   @keyframes drop { to { opacity:1; transform: translateY(0) scale(1) rotateX(0); } }
 
   .btn {
-    margin-top: 40px; padding: 14px 34px; border: 2px solid #22d3ee; border-radius: 999px;
+    margin-top: 38px; padding: 14px 34px; border: 2px solid #22d3ee; border-radius: 999px;
     background: rgba(34,211,238,0.08); color:#aef3ff; font-size: clamp(15px,4.4vw,19px);
     font-weight: 800; letter-spacing: 2px; cursor: pointer;
     text-shadow:0 0 8px #22d3ee; box-shadow: 0 0 16px rgba(34,211,238,.35);
@@ -75,14 +79,22 @@
 
 <div id="start" class="overlay">
   <div class="title"><span class="small">MARLO IM</span>SEILPARK</div>
-  <div class="subtitle">Bring Marlo durch den nächtlichen Seilpark und schnapp dir die geheime PIN.</div>
+  <div class="subtitle">Schaffe alle <b>3 Challenges</b> im nächtlichen Seilpark.<br>Erst dann gibt der Tresor die geheime PIN frei.</div>
+  <div class="locks">🔒&nbsp;🔒&nbsp;🔒</div>
   <div class="tap-cta">TIPPEN ZUM STARTEN</div>
-  <div class="hint" style="margin-top:14px;color:#64748b;font-size:14px;">Tippen = Springen · nochmal tippen = Doppelsprung</div>
+</div>
+
+<div id="inter" class="overlay hidden">
+  <div class="step">CHALLENGE 1 / 3</div>
+  <div class="ititle">DER SPRINT</div>
+  <div class="isub">Anleitung…</div>
+  <div class="locks" style="margin-top:22px;">🔒&nbsp;🔒&nbsp;🔒</div>
+  <div class="tap-cta">TIPPEN ZUM START</div>
 </div>
 
 <div id="win" class="overlay hidden">
-  <div class="won">PARCOURS GESCHAFFT!</div>
-  <div class="lock">🔓 PIN ENTSPERRT</div>
+  <div class="won">ALLE 3 CHALLENGES<br>GESCHAFFT!</div>
+  <div class="lock">🔓 TRESOR ENTSPERRT</div>
   <div class="pin"><div class="d">3</div><div class="d">8</div><div class="d">7</div></div>
   <button class="btn" id="again">NOCHMAL</button>
 </div>
@@ -93,93 +105,29 @@
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
   const startEl = document.getElementById("start");
+  const interEl = document.getElementById("inter");
   const winEl = document.getElementById("win");
   const againBtn = document.getElementById("again");
 
   // ---- Virtual coordinate system (fixed virtual height = 720) ----
   const VH = 720;
   let scale = 1, VW = 1280, dpr = 1;
-
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = window.innerWidth, h = window.innerHeight;
-    canvas.width = Math.floor(w * dpr);
-    canvas.height = Math.floor(h * dpr);
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
-    scale = h / VH;
-    VW = w / scale;
+    canvas.width = Math.floor(w * dpr); canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + "px"; canvas.style.height = h + "px";
+    scale = h / VH; VW = w / scale;
   }
   window.addEventListener("resize", resize);
   resize();
 
-  // ---- Game constants ----
-  const GRAVITY = 1.15;
-  const JUMP_V = -22;
-  const SPEED = 6.0;            // world scroll speed (virtual px / frame)
-  const PLAYER_W = 40, PLAYER_H = 52;
-  const PLAYER_SCREEN_FRAC = 0.30;
-  const FINISH_X = 5500;
-
-  // ---- Level: platforms in world coords. y = surface (top) in virtual px ----
-  const platforms = [
-    { x: 0,    w: 950,  y: 560 },
-    { x: 1110, w: 700,  y: 540 },
-    { x: 1990, w: 600,  y: 500 },
-    { x: 2760, w: 700,  y: 545 },
-    { x: 3610, w: 600,  y: 480 },
-    { x: 4390, w: 700,  y: 545 },
-    { x: 5200, w: 1100, y: 560 }, // final platform
-  ];
-  const orbsInit = [
-    { x: 1460, y: 540 - 95, digit: "3" },
-    { x: 3110, y: 545 - 95, digit: "8" },
-    { x: 4740, y: 545 - 95, digit: "7" },
-  ];
-
-  // ---- State ----
-  let state = "start"; // start | play | win
-  let worldOffset = 0;
-  let player = { y: 0, vy: 0, prevFoot: 0, grounded: false, jumpsLeft: 2 };
-  let checkpoint = platforms[0];
-  let orbs = [];
-  let collected = [];
-  let t = 0;
-
-  // Background decorations
-  const stars = [];
-  for (let i = 0; i < 90; i++) {
-    stars.push({ x: Math.random(), y: Math.random() * 0.7, r: Math.random() * 1.6 + 0.4, tw: Math.random() * 6.28 });
-  }
-
-  function worldPlayerX() { return worldOffset + VW * PLAYER_SCREEN_FRAC; }
-
-  function reset() {
-    worldOffset = 0;
-    orbs = orbsInit.map(o => ({ ...o, collected: false }));
-    collected = [];
-    checkpoint = platforms[0];
-    player.y = platforms[0].y - PLAYER_H;
-    player.vy = 0; player.prevFoot = player.y + PLAYER_H;
-    player.grounded = true; player.jumpsLeft = 2;
-  }
-
-  function respawn() {
-    const pf = checkpoint;
-    worldOffset = pf.x + pf.w * 0.45 - VW * PLAYER_SCREEN_FRAC;
-    if (worldOffset < 0) worldOffset = 0;
-    player.y = pf.y - PLAYER_H;
-    player.vy = 0; player.prevFoot = player.y + PLAYER_H;
-    player.grounded = true; player.jumpsLeft = 2;
-  }
-
-  // ---- Audio (tiny WebAudio blips) ----
+  // ---- Audio ----
   let actx = null;
   function beep(freq, dur, type = "square", gain = 0.05) {
     if (!actx) return;
     const o = actx.createOscillator(), g = actx.createGain();
-    o.type = type; o.frequency.value = freq;
-    g.gain.value = gain;
+    o.type = type; o.frequency.value = freq; g.gain.value = gain;
     o.connect(g); g.connect(actx.destination);
     const now = actx.currentTime;
     g.gain.setValueAtTime(gain, now);
@@ -190,259 +138,380 @@
     if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
     if (actx && actx.state === "suspended") actx.resume();
   }
-  function winJingle() {
-    [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.18, "triangle", 0.07), i * 130));
+  function sfxJump(n){ beep(n ? 620 : 440, 0.09, "square", 0.045); }
+  function sfxGood(){ beep(880,0.1,"triangle",0.06); setTimeout(()=>beep(1320,0.09,"triangle",0.05),70); }
+  function sfxFail(){ beep(200,0.18,"sawtooth",0.06); setTimeout(()=>beep(130,0.22,"sawtooth",0.06),90); }
+  function sfxWin(){ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,0.2,"triangle",0.07),i*140)); }
+
+  // ---- Shared visuals ----
+  const t = { n: 0 };
+  const stars = [];
+  for (let i = 0; i < 90; i++) stars.push({ x: Math.random(), y: Math.random()*0.7, r: Math.random()*1.6+0.4, tw: Math.random()*6.28 });
+
+  function drawBackground(scrollX) {
+    const g = ctx.createLinearGradient(0,0,0,VH);
+    g.addColorStop(0,"#0a0e1f"); g.addColorStop(0.55,"#10182e"); g.addColorStop(1,"#0a1322");
+    ctx.fillStyle = g; ctx.fillRect(0,0,VW,VH);
+    for (const s of stars) {
+      ctx.globalAlpha = 0.4 + 0.5*Math.abs(Math.sin(t.n*0.03 + s.tw));
+      ctx.fillStyle = "#bfe9ff";
+      ctx.beginPath(); ctx.arc(s.x*VW, s.y*VH, s.r, 0, 6.28); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    drawTrees(scrollX*0.25, "#0c1426", 150, 0.6);
+    drawTrees(scrollX*0.5,  "#0a101f", 210, 0.85);
+  }
+  function drawTrees(off, color, height, baseFrac) {
+    off = ((off % 300) + 300) % 300;
+    ctx.fillStyle = color;
+    const baseY = VH*baseFrac + 120;
+    for (let i = -1; i < VW/150 + 2; i++) {
+      const x = i*150 - off;
+      ctx.beginPath(); ctx.moveTo(x,baseY); ctx.lineTo(x+55,baseY-height); ctx.lineTo(x+110,baseY); ctx.closePath(); ctx.fill();
+    }
+  }
+  function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+  // Amber Marlo. (x,y)=top-left of 40x52 box. tilt in radians, showName optional.
+  const MW = 40, MH = 52;
+  function drawMarlo(x, y, tilt, showName, ropeTo) {
+    ctx.save();
+    ctx.translate(x + MW/2, y + MH/2);
+    if (tilt) ctx.rotate(tilt);
+    ctx.save();
+    ctx.shadowColor = "#ff8a2b"; ctx.shadowBlur = 16;
+    if (ropeTo) {
+      ctx.strokeStyle = "rgba(255,160,70,0.35)"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, -MH/2+6); ctx.lineTo(ropeTo.x, ropeTo.y); ctx.stroke();
+    }
+    ctx.fillStyle = "#ff9f43";                       // body
+    roundRect(-MW/2+6, -MH/2+16, MW-12, MH-16, 7); ctx.fill();
+    ctx.fillStyle = "#ffd9a3";                       // head
+    ctx.beginPath(); ctx.arc(0, -MH/2+12, 11, 0, 6.28); ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = "#d9711f"; ctx.lineWidth = 4;  // legs
+    const swing = Math.sin(t.n*0.4)*5;
+    ctx.beginPath();
+    ctx.moveTo(-MW/2+14, MH/2-2); ctx.lineTo(-MW/2+14+swing, MH/2+8);
+    ctx.moveTo(MW/2-14, MH/2-2);  ctx.lineTo(MW/2-14-swing, MH/2+8);
+    ctx.stroke();
+    ctx.restore();
+    if (showName) {
+      ctx.fillStyle = "rgba(255,217,163,0.85)"; ctx.font = "bold 11px system-ui";
+      ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      ctx.fillText("MARLO", x + MW/2, y - 4);
+    }
+  }
+
+  function neonText(str, x, y, size, color, glow, align="center") {
+    ctx.save();
+    ctx.textAlign = align; ctx.textBaseline = "middle";
+    ctx.font = "bold " + size + "px system-ui";
+    ctx.shadowColor = glow; ctx.shadowBlur = 14; ctx.fillStyle = color;
+    ctx.fillText(str, x, y); ctx.restore();
+  }
+
+  // ============================================================
+  // CHALLENGE 1 — DER SPRINT (auto-runner, harder)
+  // ============================================================
+  const C1 = {
+    SPEED: 6.8, GRAVITY: 1.2, JUMP_V: -22, PX_FRAC: 0.28,
+    platforms: [
+      { x: 0,    w: 650, y: 560 },
+      { x: 840,  w: 200, y: 535 },
+      { x: 1240, w: 200, y: 505 },
+      { x: 1635, w: 200, y: 545 },
+      { x: 2040, w: 190, y: 500 },
+      { x: 2425, w: 200, y: 540 },
+      { x: 2830, w: 200, y: 510 },
+      { x: 3230, w: 900, y: 560 },
+    ],
+    FINISH: 3470,
+    reset() {
+      this.off = 0; this.y = this.platforms[0].y - MH; this.vy = 0;
+      this.prevFoot = this.y + MH; this.jumps = 2; this.checkpoint = this.platforms[0];
+      this.flash = 0;
+    },
+    px(){ return this.off + VW*this.PX_FRAC; },
+    tap(){
+      if (this.jumps > 0) { this.vy = this.JUMP_V; this.jumps--; sfxJump(this.jumps === 1); }
+    },
+    fail(){ sfxFail(); this.off = 0; this.y = this.platforms[0].y - MH; this.vy = 0;
+      this.prevFoot = this.y+MH; this.jumps = 2; this.checkpoint = this.platforms[0]; this.flash = 45; },
+    update(){
+      if (this.flash > 0) this.flash--;
+      this.off += this.SPEED;
+      this.vy += this.GRAVITY; this.y += this.vy;
+      const px = this.px(), foot = this.y + MH;
+      let grounded = false;
+      for (const pf of this.platforms) {
+        if (px >= pf.x && px <= pf.x + pf.w) {
+          if (this.prevFoot <= pf.y + 2 && foot >= pf.y && this.vy >= 0) {
+            this.y = pf.y - MH; this.vy = 0; grounded = true; this.jumps = 2; this.checkpoint = pf;
+          }
+          break;
+        }
+      }
+      this.prevFoot = this.y + MH;
+      if (this.y > VH + 120) this.fail();
+      if (px >= this.FINISH) finishChallenge();
+    },
+    render(){
+      drawBackground(this.off);
+      for (const pf of this.platforms) this.plat(pf);
+      drawMarlo(VW*this.PX_FRAC, this.y, 0, true, {x:30,y:-this.y-10});
+      hud("1/3 · DER SPRINT");
+      if (this.flash > 0) bigFlash("NOCHMAL!");
+    },
+    plat(pf){
+      const sx = pf.x - this.off;
+      if (sx + pf.w < -50 || sx > VW + 50) return;
+      const y = pf.y;
+      ctx.strokeStyle = "rgba(34,211,238,0.22)"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(sx+8,y); ctx.lineTo(sx-40,-10);
+      ctx.moveTo(sx+pf.w-8,y); ctx.lineTo(sx+pf.w+40,-10); ctx.stroke();
+      ctx.fillStyle = "#13203a"; ctx.fillRect(sx, y, pf.w, 18);
+      ctx.save(); ctx.shadowColor = "#22d3ee"; ctx.shadowBlur = 18;
+      ctx.fillStyle = "#5ff0ff"; ctx.fillRect(sx, y-3, pf.w, 5); ctx.restore();
+      if (pf === this.platforms[this.platforms.length-1]) {
+        const fx = sx + 110;
+        ctx.strokeStyle = "#9bffb0"; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(fx,y); ctx.lineTo(fx,y-90); ctx.stroke();
+        ctx.save(); ctx.shadowColor="#22c55e"; ctx.shadowBlur=16; ctx.fillStyle="#22c55e";
+        ctx.fillRect(fx, y-90, 46, 30); ctx.restore();
+        ctx.font="bold 26px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText("🏁", fx+23, y-74);
+      }
+    },
+  };
+
+  // ============================================================
+  // CHALLENGE 2 — DIE HÄNGEBRÜCKE (balance, tap left/right)
+  // ============================================================
+  const C2 = {
+    reset(){ this.tilt = 0; this.tv = 0; this.prog = 0; this.windT = Math.random()*99; this.flash = 0; },
+    tap(x){
+      const dir = x < VW/2 ? -1 : 1;   // push Marlo toward that side
+      this.tv += dir * 0.012;
+      beep(dir < 0 ? 500 : 560, 0.05, "square", 0.04);
+    },
+    fail(){ sfxFail(); this.tilt = 0; this.tv = 0; this.prog = Math.max(0, this.prog - 0.18); this.flash = 45; },
+    update(){
+      if (this.flash > 0) this.flash--;
+      this.windT += 0.02;
+      const gust = (Math.sin(this.windT) + Math.sin(this.windT*2.3+1))*0.5; // -1..1-ish
+      const windScale = 0.0011 * (0.5 + this.prog);     // stronger near the end
+      this.tv += gust * windScale;
+      this.tv += this.tilt * 0.0016;                    // inverted-pendulum instability
+      this.tv *= 0.99;
+      this.tilt += this.tv;
+      if (Math.abs(this.tilt) >= 1) this.fail();
+      this.prog += 1/780;                                // ~13 s to cross
+      if (this.prog >= 1) finishChallenge();
+    },
+    render(){
+      drawBackground(t.n*1.2);
+      // chasm + sagging rope bridge
+      const midY = VH*0.62;
+      const ax = VW*0.06, bx = VW*0.94;
+      ctx.strokeStyle = "#5ff0ff"; ctx.lineWidth = 4;
+      ctx.save(); ctx.shadowColor = "#22d3ee"; ctx.shadowBlur = 12;
+      for (const dy of [0, 70]) {
+        ctx.beginPath();
+        for (let i=0;i<=40;i++){ const u=i/40; const sag=Math.sin(u*Math.PI)*55;
+          const xx=ax+(bx-ax)*u, yy=midY+dy+sag; i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy); }
+        ctx.stroke();
+      }
+      ctx.restore();
+      // planks
+      ctx.strokeStyle = "rgba(95,240,255,0.35)"; ctx.lineWidth = 6;
+      for (let i=2;i<=38;i+=2){ const u=i/40; const sag=Math.sin(u*Math.PI)*55;
+        const xx=ax+(bx-ax)*u, yy=midY+sag; ctx.beginPath(); ctx.moveTo(xx,yy); ctx.lineTo(xx,yy+70); ctx.stroke(); }
+      // Marlo at current progress on the bridge
+      const u = 0.08 + 0.84*this.prog;
+      const mx = ax + (bx-ax)*u - MW/2;
+      const my = midY + Math.sin(u*Math.PI)*55 - MH;
+      drawMarlo(mx, my, this.tilt*0.6, true, null);
+      // tilt meter
+      const mw = VW*0.7, mxm = (VW-mw)/2, mym = 80;
+      ctx.fillStyle = "rgba(255,255,255,0.08)"; roundRect(mxm,mym,mw,14,7); ctx.fill();
+      const danger = Math.abs(this.tilt) > 0.7;
+      ctx.fillStyle = danger ? "#ff5c5c" : "#7ff7ff";
+      ctx.save(); ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 12;
+      const knob = mxm + mw/2 + this.tilt*(mw/2 - 8);
+      ctx.beginPath(); ctx.arc(knob, mym+7, 11, 0, 6.28); ctx.fill(); ctx.restore();
+      neonText("◀ TIPPEN  ·  TIPPEN ▶", VW/2, mym+40, 16, "#bcd0ea", "#22d3ee");
+      // progress
+      progressBar(this.prog);
+      hud("2/3 · DIE HÄNGEBRÜCKE");
+      if (this.flash > 0) bigFlash("FAST!");
+    },
+  };
+
+  // ============================================================
+  // CHALLENGE 3 — DER ABSPRUNG (timing, hit the zone 5x)
+  // ============================================================
+  const C3 = {
+    NEED: 5,
+    reset(){ this.m = 0.5; this.dir = 1; this.sp = 0.015; this.hw = 0.14; this.zc = 0.5;
+      this.hits = 0; this.flash = 0; this.swing = 0; },
+    newZone(){ this.zc = 0.25 + Math.random()*0.5; this.sp += 0.004; this.hw = Math.max(0.05, this.hw*0.84);
+      if (Math.random()<0.5) this.dir *= -1; },
+    tap(){
+      if (this.flash > 0) return;
+      if (Math.abs(this.m - this.zc) <= this.hw) {
+        this.hits++; sfxGood(); this.swing = 1;
+        if (this.hits >= this.NEED) { finishChallenge(); return; }
+        this.newZone();
+      } else { this.fail(); }
+    },
+    fail(){ sfxFail(); this.flash = 45; this.hits = 0; this.sp = 0.015; this.hw = 0.14; this.m = 0.5; this.dir = 1; },
+    update(){
+      if (this.flash > 0) { this.flash--; return; }
+      if (this.swing > 0) this.swing -= 0.06;
+      this.m += this.sp * this.dir;
+      if (this.m > 1) { this.m = 1; this.dir = -1; }
+      if (this.m < 0) { this.m = 0; this.dir = 1; }
+    },
+    render(){
+      drawBackground(t.n*0.8);
+      const trackY = VH*0.5, tx = VW*0.1, tw = VW*0.8;
+      // poles showing progress
+      for (let i=0;i<=this.NEED;i++){ const u=i/this.NEED; const sx=tx+tw*u;
+        ctx.strokeStyle = i<=this.hits ? "#9bffb0" : "rgba(120,160,200,0.4)";
+        ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(sx, trackY-40); ctx.lineTo(sx, VH*0.78); ctx.stroke(); }
+      // timing bar
+      const barY = trackY, bx = tx, bw = tw;
+      ctx.fillStyle = "rgba(255,255,255,0.07)"; roundRect(bx, barY-10, bw, 20, 10); ctx.fill();
+      // zone
+      const zx = bx + (this.zc - this.hw)*bw, zw = (2*this.hw)*bw;
+      ctx.save(); ctx.shadowColor = "#22c55e"; ctx.shadowBlur = 14; ctx.fillStyle = "rgba(34,197,94,0.55)";
+      roundRect(zx, barY-12, zw, 24, 8); ctx.fill(); ctx.restore();
+      // marker
+      const mx = bx + this.m*bw;
+      ctx.save(); ctx.shadowColor = "#ffae5c"; ctx.shadowBlur = 16; ctx.fillStyle = "#ffd29c";
+      ctx.beginPath(); ctx.arc(mx, barY, 12, 0, 6.28); ctx.fill(); ctx.restore();
+      // Marlo swinging on the rope above current pole
+      const u = this.hits/this.NEED;
+      const baseX = tx + tw*u;
+      const sw = Math.sin(this.swing*Math.PI) * 60;
+      drawMarlo(baseX - MW/2 + sw, trackY - 140 - Math.abs(sw)*0.4, sw*0.004, true, {x:-sw*0.4, y:-90});
+      neonText("TIPPEN, wenn der Punkt GRÜN ist", VW/2, barY+70, 15, "#bcd0ea", "#22d3ee");
+      neonText("TREFFER  " + this.hits + " / " + this.NEED, VW/2, barY+105, 22, "#9bffb0", "#22c55e");
+      hud("3/3 · DER ABSPRUNG");
+      if (this.flash > 0) bigFlash("DANEBEN!");
+    },
+  };
+
+  // ---- Shared HUD helpers ----
+  function hud(label){
+    ctx.save(); ctx.textAlign = "left"; ctx.textBaseline = "top";
+    ctx.font = "bold 16px system-ui"; ctx.fillStyle = "#9fb3d1";
+    ctx.fillText(label, 16, 16);
+    ctx.textAlign = "right";
+    const locks = ["🔒","🔒","🔒"]; for (let i=0;i<doneCount;i++) locks[i]="🔓";
+    ctx.font = "16px system-ui"; ctx.fillStyle = "#cfe6ff";
+    ctx.fillText("PIN " + locks.join(" "), VW-16, 16);
+    ctx.restore();
+  }
+  function progressBar(p){
+    const w = VW*0.7, x = (VW-w)/2, y = VH-46;
+    ctx.fillStyle = "rgba(255,255,255,0.08)"; roundRect(x,y,w,12,6); ctx.fill();
+    ctx.save(); ctx.shadowColor="#22c55e"; ctx.shadowBlur=10; ctx.fillStyle="#7ff0a0";
+    roundRect(x,y, Math.max(6, w*Math.min(1,p)), 12, 6); ctx.fill(); ctx.restore();
+  }
+  function bigFlash(txt){
+    ctx.save(); ctx.globalAlpha = 0.9;
+    neonText(txt, VW/2, VH*0.32, Math.min(64, VW*0.13), "#ff7a5c", "#ef4444");
+    ctx.restore();
+  }
+
+  // ============================================================
+  // State machine
+  // ============================================================
+  const challenges = [C1, C2, C3];
+  const intro = [
+    { step:"CHALLENGE 1 / 3", title:"DER SPRINT",
+      sub:"Tippen = Springen (nochmal tippen = Doppelsprung).<br>Bring Marlo bis zur Ziellinie. Fällt er, geht's von vorne los." },
+    { step:"CHALLENGE 2 / 3", title:"DIE HÄNGEBRÜCKE",
+      sub:"Tippe <b>links</b> oder <b>rechts</b> auf den Bildschirm, um Marlo im Gleichgewicht zu halten.<br>Kippt er um, startet die Brücke neu." },
+    { step:"CHALLENGE 3 / 3", title:"DER ABSPRUNG",
+      sub:"Tippe genau dann, wenn der Punkt in der grünen Zone ist.<br>5 Treffer in Folge – ein Fehler und es geht von vorne." },
+  ];
+  let state = "start";   // start | intro | play | win
+  let current = 0;
+  let doneCount = 0;
+
+  function showIntro(i){
+    current = i;
+    interEl.querySelector(".step").textContent = intro[i].step;
+    interEl.querySelector(".ititle").textContent = intro[i].title;
+    interEl.querySelector(".isub").innerHTML = intro[i].sub;
+    const locks = ["🔒","🔒","🔒"]; for (let k=0;k<doneCount;k++) locks[k]="🔓";
+    interEl.querySelector(".locks").innerHTML = locks.join("&nbsp;");
+    interEl.classList.remove("hidden");
+    state = "intro";
+  }
+  function startChallenge(i){
+    interEl.classList.add("hidden");
+    challenges[i].reset();
+    state = "play";
+  }
+  function finishChallenge(){
+    doneCount = current + 1;
+    sfxGood();
+    if (current >= challenges.length - 1) {
+      state = "win";
+      sfxWin();
+      setTimeout(() => winEl.classList.remove("hidden"), 350);
+    } else {
+      setTimeout(() => showIntro(current + 1), 150);
+      state = "between";
+    }
+  }
+  function restartAll(){
+    winEl.classList.add("hidden");
+    doneCount = 0;
+    showIntro(0);
   }
 
   // ---- Input ----
-  function jump() {
-    if (player.jumpsLeft > 0) {
-      player.vy = JUMP_V;
-      player.jumpsLeft--;
-      player.grounded = false;
-      beep(player.jumpsLeft === 1 ? 440 : 620, 0.09, "square", 0.045);
-    }
-  }
-  function onTap() {
-    ensureAudio();
-    if (state === "start") { startEl.classList.add("hidden"); state = "play"; reset(); }
-    else if (state === "play") { jump(); }
+  function pointerX(e){
+    const r = canvas.getBoundingClientRect();
+    return (e.clientX - r.left) / scale;
   }
   window.addEventListener("pointerdown", (e) => {
     if (e.target === againBtn) return;
-    onTap();
+    ensureAudio();
+    if (state === "start") { startEl.classList.add("hidden"); showIntro(0); return; }
+    if (state === "intro") { startChallenge(current); return; }
+    if (state === "play") { challenges[current].tap(pointerX(e)); return; }
   });
   window.addEventListener("keydown", (e) => {
-    if (e.code === "Space" || e.code === "ArrowUp") { e.preventDefault(); onTap(); }
+    if (e.code === "Space" || e.code === "ArrowUp") {
+      e.preventDefault();
+      window.dispatchEvent(new PointerEvent("pointerdown", { clientX: window.innerWidth/2 }));
+    }
   });
-  againBtn.addEventListener("click", () => {
-    winEl.classList.add("hidden");
-    state = "play"; reset();
-  });
-
-  // ---- Update ----
-  function update() {
-    t++;
-    if (state !== "play") return;
-
-    worldOffset += SPEED;
-    player.vy += GRAVITY;
-    player.y += player.vy;
-
-    const px = worldPlayerX();
-    const foot = player.y + PLAYER_H;
-
-    // Landing detection (crossing test)
-    let grounded = false;
-    for (const pf of platforms) {
-      if (px >= pf.x && px <= pf.x + pf.w) {
-        if (player.prevFoot <= pf.y + 2 && foot >= pf.y && player.vy >= 0) {
-          player.y = pf.y - PLAYER_H;
-          player.vy = 0;
-          grounded = true;
-          player.jumpsLeft = 2;
-          checkpoint = pf;
-        }
-        break;
-      }
-    }
-    player.grounded = grounded;
-    player.prevFoot = player.y + PLAYER_H;
-
-    // Fall off the world
-    if (player.y > VH + 120) { respawn(); beep(160, 0.18, "sawtooth", 0.05); }
-
-    // Collect orbs
-    for (const o of orbs) {
-      if (!o.collected && Math.abs(px - o.x) < 46 && Math.abs((player.y + PLAYER_H / 2) - o.y) < 60) {
-        o.collected = true;
-        collected.push(o.digit);
-        beep(880, 0.12, "triangle", 0.06);
-        setTimeout(() => beep(1320, 0.1, "triangle", 0.05), 80);
-      }
-    }
-
-    // Win
-    if (px >= FINISH_X) {
-      state = "win";
-      winJingle();
-      setTimeout(() => winEl.classList.remove("hidden"), 350);
-    }
-  }
-
-  // ---- Render helpers ----
-  function drawBackground() {
-    const g = ctx.createLinearGradient(0, 0, 0, VH);
-    g.addColorStop(0, "#0a0e1f");
-    g.addColorStop(0.55, "#10182e");
-    g.addColorStop(1, "#0a1322");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, VW, VH);
-
-    // Stars
-    for (const s of stars) {
-      const a = 0.4 + 0.5 * Math.abs(Math.sin(t * 0.03 + s.tw));
-      ctx.globalAlpha = a;
-      ctx.fillStyle = "#bfe9ff";
-      ctx.beginPath();
-      ctx.arc(s.x * VW, s.y * VH, s.r, 0, 6.28);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-
-    // Parallax tree silhouettes (two layers)
-    drawTrees(0.25, "#0c1426", 150, 0.6);
-    drawTrees(0.5, "#0a101f", 210, 0.85);
-  }
-
-  function drawTrees(parallax, color, height, baseFrac) {
-    const off = (worldOffset * parallax) % 300;
-    ctx.fillStyle = color;
-    const baseY = VH * baseFrac + 120;
-    for (let i = -1; i < VW / 150 + 2; i++) {
-      const x = i * 150 - off;
-      ctx.beginPath();
-      ctx.moveTo(x, baseY);
-      ctx.lineTo(x + 55, baseY - height);
-      ctx.lineTo(x + 110, baseY);
-      ctx.closePath();
-      ctx.fill();
-    }
-  }
-
-  function drawPlatform(pf) {
-    const sx = pf.x - worldOffset;
-    if (sx + pf.w < -50 || sx > VW + 50) return;
-    const y = pf.y;
-
-    // Suspension ropes from top
-    ctx.strokeStyle = "rgba(34,211,238,0.22)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(sx + 8, y); ctx.lineTo(sx - 40, -10);
-    ctx.moveTo(sx + pf.w - 8, y); ctx.lineTo(sx + pf.w + 40, -10);
-    ctx.stroke();
-
-    // Platform body
-    ctx.fillStyle = "#13203a";
-    ctx.fillRect(sx, y, pf.w, 18);
-    // Neon top edge
-    ctx.save();
-    ctx.shadowColor = "#22d3ee";
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = "#5ff0ff";
-    ctx.fillRect(sx, y - 3, pf.w, 5);
-    ctx.restore();
-
-    // Plank ticks
-    ctx.strokeStyle = "rgba(95,240,255,0.18)";
-    ctx.lineWidth = 1;
-    for (let gx = sx + 14; gx < sx + pf.w - 6; gx += 26) {
-      ctx.beginPath(); ctx.moveTo(gx, y + 2); ctx.lineTo(gx, y + 16); ctx.stroke();
-    }
-
-    // Finish flag on last platform
-    if (pf === platforms[platforms.length - 1]) {
-      const fx = sx + 90;
-      ctx.strokeStyle = "#9bffb0"; ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.moveTo(fx, y); ctx.lineTo(fx, y - 90); ctx.stroke();
-      ctx.save(); ctx.shadowColor = "#22c55e"; ctx.shadowBlur = 16;
-      ctx.fillStyle = "#22c55e";
-      ctx.fillRect(fx, y - 90, 46, 30);
-      ctx.restore();
-      ctx.font = "bold 26px system-ui"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText("🔒", fx + 23, y - 74);
-    }
-  }
-
-  function drawOrb(o) {
-    if (o.collected) return;
-    const sx = o.x - worldOffset;
-    if (sx < -40 || sx > VW + 40) return;
-    const pulse = 1 + 0.12 * Math.sin(t * 0.12);
-    const r = 22 * pulse;
-    ctx.save();
-    ctx.shadowColor = "#ffae5c"; ctx.shadowBlur = 26;
-    const g = ctx.createRadialGradient(sx, o.y, 2, sx, o.y, r);
-    g.addColorStop(0, "#fff0d6"); g.addColorStop(1, "#fb923c");
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(sx, o.y, r, 0, 6.28); ctx.fill();
-    ctx.restore();
-    ctx.fillStyle = "#3b1d05"; ctx.font = "bold 24px system-ui";
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(o.digit, sx, o.y + 1);
-  }
-
-  function drawPlayer() {
-    const sx = VW * PLAYER_SCREEN_FRAC;
-    const y = player.y;
-    ctx.save();
-    ctx.shadowColor = "#ff5cf0"; ctx.shadowBlur = 16;
-
-    // harness rope to top (thin)
-    ctx.strokeStyle = "rgba(255,140,240,0.35)"; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(sx + PLAYER_W / 2, y + 6); ctx.lineTo(sx + PLAYER_W / 2 + 30, -10); ctx.stroke();
-
-    // body
-    ctx.fillStyle = "#ff8cf0";
-    roundRect(sx + 6, y + 16, PLAYER_W - 12, PLAYER_H - 16, 7); ctx.fill();
-    // head
-    ctx.fillStyle = "#ffd1f7";
-    ctx.beginPath(); ctx.arc(sx + PLAYER_W / 2, y + 12, 11, 0, 6.28); ctx.fill();
-    ctx.restore();
-
-    // little legs (animated when grounded)
-    ctx.strokeStyle = "#c44fb8"; ctx.lineWidth = 4;
-    const swing = player.grounded ? Math.sin(t * 0.4) * 5 : 4;
-    ctx.beginPath();
-    ctx.moveTo(sx + 14, y + PLAYER_H - 2); ctx.lineTo(sx + 14 + swing, y + PLAYER_H + 8);
-    ctx.moveTo(sx + PLAYER_W - 14, y + PLAYER_H - 2); ctx.lineTo(sx + PLAYER_W - 14 - swing, y + PLAYER_H + 8);
-    ctx.stroke();
-
-    // name tag
-    ctx.fillStyle = "rgba(255,209,247,0.85)"; ctx.font = "bold 11px system-ui";
-    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
-    ctx.fillText("MARLO", sx + PLAYER_W / 2, y - 4);
-  }
-
-  function roundRect(x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-  }
-
-  function drawHUD() {
-    const digits = ["3", "8", "7"];
-    const shown = digits.map((d, i) => (collected.includes(d) ? d : "_"));
-    ctx.save();
-    ctx.textAlign = "center"; ctx.textBaseline = "top";
-    ctx.font = "bold 22px system-ui";
-    ctx.fillStyle = "#9fb3d1";
-    ctx.fillText("PIN", VW / 2, 18);
-    ctx.font = "bold 34px system-ui";
-    ctx.shadowColor = "#22d3ee"; ctx.shadowBlur = 12;
-    ctx.fillStyle = "#7ff7ff";
-    ctx.fillText(shown.join("  "), VW / 2, 42);
-    ctx.restore();
-  }
+  againBtn.addEventListener("click", restartAll);
 
   // ---- Main loop ----
-  function frame() {
-    update();
-    ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
-    ctx.clearRect(0, 0, VW, VH);
-    drawBackground();
-    for (const pf of platforms) drawPlatform(pf);
-    for (const o of orbs) drawOrb(o);
-    if (state === "play" || state === "win") { drawPlayer(); drawHUD(); }
+  function frame(){
+    t.n++;
+    ctx.setTransform(scale*dpr, 0, 0, scale*dpr, 0, 0);
+    ctx.clearRect(0,0,VW,VH);
+    if (state === "play" || state === "between") {
+      const c = challenges[current];
+      if (state === "play") c.update();
+      c.render();
+    } else {
+      // idle backdrop behind overlays
+      drawBackground(t.n*0.6);
+    }
     requestAnimationFrame(frame);
   }
-  reset();
-  player.y = platforms[0].y - PLAYER_H; // idle pose on start screen
+  C1.reset(); C2.reset(); C3.reset();
   requestAnimationFrame(frame);
 })();
 </script>
