@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Marlo im Seilpark</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #0a0e1a; touch-action: none;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    user-select: none; -webkit-user-select: none;
+  }
+  #game { display: block; width: 100vw; height: 100vh; }
+
+  .overlay {
+    position: fixed; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 24px; z-index: 10;
+    background: radial-gradient(circle at 50% 40%, rgba(10,20,40,0.55), rgba(5,8,16,0.92));
+    transition: opacity 0.4s ease;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .title {
+    font-size: clamp(34px, 11vw, 78px); font-weight: 900; letter-spacing: 2px;
+    color: #6ff7ff; line-height: 1.0;
+    text-shadow: 0 0 12px #22d3ee, 0 0 34px #0891b2, 0 0 60px #155e75;
+  }
+  .title .small { display:block; font-size: 0.42em; letter-spacing: 8px; color:#b6f4ff; margin-bottom: 6px; text-shadow: 0 0 8px #22d3ee;}
+  .subtitle { margin-top: 18px; font-size: clamp(15px, 4.4vw, 21px); color: #9fb3d1; max-width: 520px; }
+  .hint { margin-top: 10px; font-size: clamp(13px,3.6vw,16px); color:#64748b; }
+
+  .tap-cta {
+    margin-top: 38px; font-size: clamp(16px, 5vw, 24px); font-weight: 800;
+    color: #ffae5c; letter-spacing: 3px;
+    text-shadow: 0 0 12px #f97316, 0 0 28px #c2410c;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.55; transform:scale(0.98);} 50%{opacity:1; transform:scale(1.04);} }
+
+  /* Win screen */
+  #win .won { font-size: clamp(26px, 8vw, 52px); font-weight:900; color:#9bffb0;
+    text-shadow:0 0 14px #22c55e, 0 0 40px #15803d; letter-spacing:2px; }
+  #win .lock { margin-top: 14px; font-size: clamp(14px,4vw,18px); color:#9fb3d1; letter-spacing:5px; }
+  .pin {
+    margin-top: 26px; display:flex; gap: clamp(12px,4vw,28px);
+  }
+  .pin .d {
+    width: clamp(64px, 20vw, 110px); height: clamp(84px, 26vw, 144px);
+    border-radius: 16px; display:flex; align-items:center; justify-content:center;
+    font-size: clamp(46px, 15vw, 92px); font-weight:900; color:#0a0e1a;
+    background: linear-gradient(160deg, #7ff7ff, #22d3ee);
+    box-shadow: 0 0 22px #22d3ee, 0 0 50px #0891b2, inset 0 2px 12px rgba(255,255,255,.6);
+    opacity:0; transform: translateY(30px) scale(0.6) rotateX(40deg);
+    animation: drop 0.6s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  .pin .d:nth-child(1){ animation-delay:.25s; }
+  .pin .d:nth-child(2){ animation-delay:.55s; }
+  .pin .d:nth-child(3){ animation-delay:.85s; }
+  @keyframes drop { to { opacity:1; transform: translateY(0) scale(1) rotateX(0); } }
+
+  .btn {
+    margin-top: 40px; padding: 14px 34px; border: 2px solid #22d3ee; border-radius: 999px;
+    background: rgba(34,211,238,0.08); color:#aef3ff; font-size: clamp(15px,4.4vw,19px);
+    font-weight: 800; letter-spacing: 2px; cursor: pointer;
+    text-shadow:0 0 8px #22d3ee; box-shadow: 0 0 16px rgba(34,211,238,.35);
+  }
+  .btn:active { transform: scale(0.96); }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="start" class="overlay">
+  <div class="title"><span class="small">MARLO IM</span>SEILPARK</div>
+  <div class="subtitle">Bring Marlo durch den nächtlichen Seilpark und schnapp dir die geheime PIN.</div>
+  <div class="tap-cta">TIPPEN ZUM STARTEN</div>
+  <div class="hint" style="margin-top:14px;color:#64748b;font-size:14px;">Tippen = Springen · nochmal tippen = Doppelsprung</div>
+</div>
+
+<div id="win" class="overlay hidden">
+  <div class="won">PARCOURS GESCHAFFT!</div>
+  <div class="lock">🔓 PIN ENTSPERRT</div>
+  <div class="pin"><div class="d">3</div><div class="d">8</div><div class="d">7</div></div>
+  <button class="btn" id="again">NOCHMAL</button>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const startEl = document.getElementById("start");
+  const winEl = document.getElementById("win");
+  const againBtn = document.getElementById("again");
+
+  // ---- Virtual coordinate system (fixed virtual height = 720) ----
+  const VH = 720;
+  let scale = 1, VW = 1280, dpr = 1;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth, h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    scale = h / VH;
+    VW = w / scale;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  // ---- Game constants ----
+  const GRAVITY = 1.15;
+  const JUMP_V = -22;
+  const SPEED = 6.0;            // world scroll speed (virtual px / frame)
+  const PLAYER_W = 40, PLAYER_H = 52;
+  const PLAYER_SCREEN_FRAC = 0.30;
+  const FINISH_X = 5500;
+
+  // ---- Level: platforms in world coords. y = surface (top) in virtual px ----
+  const platforms = [
+    { x: 0,    w: 950,  y: 560 },
+    { x: 1110, w: 700,  y: 540 },
+    { x: 1990, w: 600,  y: 500 },
+    { x: 2760, w: 700,  y: 545 },
+    { x: 3610, w: 600,  y: 480 },
+    { x: 4390, w: 700,  y: 545 },
+    { x: 5200, w: 1100, y: 560 }, // final platform
+  ];
+  const orbsInit = [
+    { x: 1460, y: 540 - 95, digit: "3" },
+    { x: 3110, y: 545 - 95, digit: "8" },
+    { x: 4740, y: 545 - 95, digit: "7" },
+  ];
+
+  // ---- State ----
+  let state = "start"; // start | play | win
+  let worldOffset = 0;
+  let player = { y: 0, vy: 0, prevFoot: 0, grounded: false, jumpsLeft: 2 };
+  let checkpoint = platforms[0];
+  let orbs = [];
+  let collected = [];
+  let t = 0;
+
+  // Background decorations
+  const stars = [];
+  for (let i = 0; i < 90; i++) {
+    stars.push({ x: Math.random(), y: Math.random() * 0.7, r: Math.random() * 1.6 + 0.4, tw: Math.random() * 6.28 });
+  }
+
+  function worldPlayerX() { return worldOffset + VW * PLAYER_SCREEN_FRAC; }
+
+  function reset() {
+    worldOffset = 0;
+    orbs = orbsInit.map(o => ({ ...o, collected: false }));
+    collected = [];
+    checkpoint = platforms[0];
+    player.y = platforms[0].y - PLAYER_H;
+    player.vy = 0; player.prevFoot = player.y + PLAYER_H;
+    player.grounded = true; player.jumpsLeft = 2;
+  }
+
+  function respawn() {
+    const pf = checkpoint;
+    worldOffset = pf.x + pf.w * 0.45 - VW * PLAYER_SCREEN_FRAC;
+    if (worldOffset < 0) worldOffset = 0;
+    player.y = pf.y - PLAYER_H;
+    player.vy = 0; player.prevFoot = player.y + PLAYER_H;
+    player.grounded = true; player.jumpsLeft = 2;
+  }
+
+  // ---- Audio (tiny WebAudio blips) ----
+  let actx = null;
+  function beep(freq, dur, type = "square", gain = 0.05) {
+    if (!actx) return;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.value = gain;
+    o.connect(g); g.connect(actx.destination);
+    const now = actx.currentTime;
+    g.gain.setValueAtTime(gain, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    o.start(now); o.stop(now + dur);
+  }
+  function ensureAudio() {
+    if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+    if (actx && actx.state === "suspended") actx.resume();
+  }
+  function winJingle() {
+    [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.18, "triangle", 0.07), i * 130));
+  }
+
+  // ---- Input ----
+  function jump() {
+    if (player.jumpsLeft > 0) {
+      player.vy = JUMP_V;
+      player.jumpsLeft--;
+      player.grounded = false;
+      beep(player.jumpsLeft === 1 ? 440 : 620, 0.09, "square", 0.045);
+    }
+  }
+  function onTap() {
+    ensureAudio();
+    if (state === "start") { startEl.classList.add("hidden"); state = "play"; reset(); }
+    else if (state === "play") { jump(); }
+  }
+  window.addEventListener("pointerdown", (e) => {
+    if (e.target === againBtn) return;
+    onTap();
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" || e.code === "ArrowUp") { e.preventDefault(); onTap(); }
+  });
+  againBtn.addEventListener("click", () => {
+    winEl.classList.add("hidden");
+    state = "play"; reset();
+  });
+
+  // ---- Update ----
+  function update() {
+    t++;
+    if (state !== "play") return;
+
+    worldOffset += SPEED;
+    player.vy += GRAVITY;
+    player.y += player.vy;
+
+    const px = worldPlayerX();
+    const foot = player.y + PLAYER_H;
+
+    // Landing detection (crossing test)
+    let grounded = false;
+    for (const pf of platforms) {
+      if (px >= pf.x && px <= pf.x + pf.w) {
+        if (player.prevFoot <= pf.y + 2 && foot >= pf.y && player.vy >= 0) {
+          player.y = pf.y - PLAYER_H;
+          player.vy = 0;
+          grounded = true;
+          player.jumpsLeft = 2;
+          checkpoint = pf;
+        }
+        break;
+      }
+    }
+    player.grounded = grounded;
+    player.prevFoot = player.y + PLAYER_H;
+
+    // Fall off the world
+    if (player.y > VH + 120) { respawn(); beep(160, 0.18, "sawtooth", 0.05); }
+
+    // Collect orbs
+    for (const o of orbs) {
+      if (!o.collected && Math.abs(px - o.x) < 46 && Math.abs((player.y + PLAYER_H / 2) - o.y) < 60) {
+        o.collected = true;
+        collected.push(o.digit);
+        beep(880, 0.12, "triangle", 0.06);
+        setTimeout(() => beep(1320, 0.1, "triangle", 0.05), 80);
+      }
+    }
+
+    // Win
+    if (px >= FINISH_X) {
+      state = "win";
+      winJingle();
+      setTimeout(() => winEl.classList.remove("hidden"), 350);
+    }
+  }
+
+  // ---- Render helpers ----
+  function drawBackground() {
+    const g = ctx.createLinearGradient(0, 0, 0, VH);
+    g.addColorStop(0, "#0a0e1f");
+    g.addColorStop(0.55, "#10182e");
+    g.addColorStop(1, "#0a1322");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, VW, VH);
+
+    // Stars
+    for (const s of stars) {
+      const a = 0.4 + 0.5 * Math.abs(Math.sin(t * 0.03 + s.tw));
+      ctx.globalAlpha = a;
+      ctx.fillStyle = "#bfe9ff";
+      ctx.beginPath();
+      ctx.arc(s.x * VW, s.y * VH, s.r, 0, 6.28);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Parallax tree silhouettes (two layers)
+    drawTrees(0.25, "#0c1426", 150, 0.6);
+    drawTrees(0.5, "#0a101f", 210, 0.85);
+  }
+
+  function drawTrees(parallax, color, height, baseFrac) {
+    const off = (worldOffset * parallax) % 300;
+    ctx.fillStyle = color;
+    const baseY = VH * baseFrac + 120;
+    for (let i = -1; i < VW / 150 + 2; i++) {
+      const x = i * 150 - off;
+      ctx.beginPath();
+      ctx.moveTo(x, baseY);
+      ctx.lineTo(x + 55, baseY - height);
+      ctx.lineTo(x + 110, baseY);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  function drawPlatform(pf) {
+    const sx = pf.x - worldOffset;
+    if (sx + pf.w < -50 || sx > VW + 50) return;
+    const y = pf.y;
+
+    // Suspension ropes from top
+    ctx.strokeStyle = "rgba(34,211,238,0.22)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(sx + 8, y); ctx.lineTo(sx - 40, -10);
+    ctx.moveTo(sx + pf.w - 8, y); ctx.lineTo(sx + pf.w + 40, -10);
+    ctx.stroke();
+
+    // Platform body
+    ctx.fillStyle = "#13203a";
+    ctx.fillRect(sx, y, pf.w, 18);
+    // Neon top edge
+    ctx.save();
+    ctx.shadowColor = "#22d3ee";
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = "#5ff0ff";
+    ctx.fillRect(sx, y - 3, pf.w, 5);
+    ctx.restore();
+
+    // Plank ticks
+    ctx.strokeStyle = "rgba(95,240,255,0.18)";
+    ctx.lineWidth = 1;
+    for (let gx = sx + 14; gx < sx + pf.w - 6; gx += 26) {
+      ctx.beginPath(); ctx.moveTo(gx, y + 2); ctx.lineTo(gx, y + 16); ctx.stroke();
+    }
+
+    // Finish flag on last platform
+    if (pf === platforms[platforms.length - 1]) {
+      const fx = sx + 90;
+      ctx.strokeStyle = "#9bffb0"; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(fx, y); ctx.lineTo(fx, y - 90); ctx.stroke();
+      ctx.save(); ctx.shadowColor = "#22c55e"; ctx.shadowBlur = 16;
+      ctx.fillStyle = "#22c55e";
+      ctx.fillRect(fx, y - 90, 46, 30);
+      ctx.restore();
+      ctx.font = "bold 26px system-ui"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("🔒", fx + 23, y - 74);
+    }
+  }
+
+  function drawOrb(o) {
+    if (o.collected) return;
+    const sx = o.x - worldOffset;
+    if (sx < -40 || sx > VW + 40) return;
+    const pulse = 1 + 0.12 * Math.sin(t * 0.12);
+    const r = 22 * pulse;
+    ctx.save();
+    ctx.shadowColor = "#ffae5c"; ctx.shadowBlur = 26;
+    const g = ctx.createRadialGradient(sx, o.y, 2, sx, o.y, r);
+    g.addColorStop(0, "#fff0d6"); g.addColorStop(1, "#fb923c");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(sx, o.y, r, 0, 6.28); ctx.fill();
+    ctx.restore();
+    ctx.fillStyle = "#3b1d05"; ctx.font = "bold 24px system-ui";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(o.digit, sx, o.y + 1);
+  }
+
+  function drawPlayer() {
+    const sx = VW * PLAYER_SCREEN_FRAC;
+    const y = player.y;
+    ctx.save();
+    ctx.shadowColor = "#ff5cf0"; ctx.shadowBlur = 16;
+
+    // harness rope to top (thin)
+    ctx.strokeStyle = "rgba(255,140,240,0.35)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(sx + PLAYER_W / 2, y + 6); ctx.lineTo(sx + PLAYER_W / 2 + 30, -10); ctx.stroke();
+
+    // body
+    ctx.fillStyle = "#ff8cf0";
+    roundRect(sx + 6, y + 16, PLAYER_W - 12, PLAYER_H - 16, 7); ctx.fill();
+    // head
+    ctx.fillStyle = "#ffd1f7";
+    ctx.beginPath(); ctx.arc(sx + PLAYER_W / 2, y + 12, 11, 0, 6.28); ctx.fill();
+    ctx.restore();
+
+    // little legs (animated when grounded)
+    ctx.strokeStyle = "#c44fb8"; ctx.lineWidth = 4;
+    const swing = player.grounded ? Math.sin(t * 0.4) * 5 : 4;
+    ctx.beginPath();
+    ctx.moveTo(sx + 14, y + PLAYER_H - 2); ctx.lineTo(sx + 14 + swing, y + PLAYER_H + 8);
+    ctx.moveTo(sx + PLAYER_W - 14, y + PLAYER_H - 2); ctx.lineTo(sx + PLAYER_W - 14 - swing, y + PLAYER_H + 8);
+    ctx.stroke();
+
+    // name tag
+    ctx.fillStyle = "rgba(255,209,247,0.85)"; ctx.font = "bold 11px system-ui";
+    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    ctx.fillText("MARLO", sx + PLAYER_W / 2, y - 4);
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawHUD() {
+    const digits = ["3", "8", "7"];
+    const shown = digits.map((d, i) => (collected.includes(d) ? d : "_"));
+    ctx.save();
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.font = "bold 22px system-ui";
+    ctx.fillStyle = "#9fb3d1";
+    ctx.fillText("PIN", VW / 2, 18);
+    ctx.font = "bold 34px system-ui";
+    ctx.shadowColor = "#22d3ee"; ctx.shadowBlur = 12;
+    ctx.fillStyle = "#7ff7ff";
+    ctx.fillText(shown.join("  "), VW / 2, 42);
+    ctx.restore();
+  }
+
+  // ---- Main loop ----
+  function frame() {
+    update();
+    ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
+    ctx.clearRect(0, 0, VW, VH);
+    drawBackground();
+    for (const pf of platforms) drawPlatform(pf);
+    for (const o of orbs) drawOrb(o);
+    if (state === "play" || state === "win") { drawPlayer(); drawHUD(); }
+    requestAnimationFrame(frame);
+  }
+  reset();
+  player.y = platforms[0].y - PLAYER_H; // idle pose on start screen
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
