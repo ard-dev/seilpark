@@ -354,9 +354,9 @@
   // ============================================================
   const C3 = {
     NEED: 5,
-    reset(){ this.m = 0.5; this.dir = 1; this.sp = 0.015; this.hw = 0.14; this.zc = 0.5;
+    reset(){ this.m = 0.5; this.dir = 1; this.sp = 0.014; this.hw = 0.15; this.zc = 0.5;
       this.hits = 0; this.flash = 0; this.swing = 0; },
-    newZone(){ this.zc = 0.25 + Math.random()*0.5; this.sp += 0.004; this.hw = Math.max(0.05, this.hw*0.84);
+    newZone(){ this.zc = 0.25 + Math.random()*0.5; this.sp += 0.0022; this.hw = Math.max(0.095, this.hw*0.93);
       if (Math.random()<0.5) this.dir *= -1; },
     tap(){
       if (this.flash > 0) return;
@@ -366,7 +366,7 @@
         this.newZone();
       } else { this.fail(); }
     },
-    fail(){ sfxFail(); this.flash = 45; this.hits = 0; this.sp = 0.015; this.hw = 0.14; this.m = 0.5; this.dir = 1; },
+    fail(){ sfxFail(); this.flash = 45; this.hits = 0; this.sp = 0.014; this.hw = 0.15; this.m = 0.5; this.dir = 1; },
     update(){
       if (this.flash > 0) { this.flash--; return; }
       if (this.swing > 0) this.swing -= 0.06;
