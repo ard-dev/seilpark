@@ -46,6 +46,19 @@
     text-shadow: 0 0 12px #22d3ee, 0 0 34px #0891b2; line-height:1.05; }
   #inter .isub { margin-top: 18px; font-size: clamp(15px,4.4vw,20px); color:#bcd0ea; max-width:540px; line-height:1.5; }
 
+  /* Challenge-complete confirmation */
+  #done .check {
+    width: clamp(90px,26vw,150px); height: clamp(90px,26vw,150px); border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size: clamp(54px,16vw,92px); color:#0a0e1a; font-weight:900;
+    background: radial-gradient(circle at 40% 35%, #b6ffc6, #22c55e);
+    box-shadow: 0 0 28px #22c55e, 0 0 70px #15803d;
+    animation: pop 0.5s cubic-bezier(.2,1.5,.4,1) both;
+  }
+  @keyframes pop { from { transform: scale(0); opacity:0; } to { transform: scale(1); opacity:1; } }
+  #done .dtitle { margin-top: 22px; font-size: clamp(28px,8.5vw,56px); font-weight:900; color:#9bffb0;
+    text-shadow:0 0 12px #22c55e, 0 0 34px #15803d; line-height:1.05; }
+
   /* Win screen */
   #win .won { font-size: clamp(24px, 7.5vw, 50px); font-weight:900; color:#9bffb0;
     text-shadow:0 0 14px #22c55e, 0 0 40px #15803d; letter-spacing:1px; line-height:1.1; }
@@ -79,7 +92,7 @@
 
 <div id="start" class="overlay">
   <div class="title"><span class="small">MARLO IM</span>SEILPARK</div>
-  <div class="subtitle">Schaffe alle <b>3 Challenges</b> im nächtlichen Seilpark.<br>Erst dann gibt der Tresor die geheime PIN frei.</div>
+  <div class="subtitle">Schaffe alle <b>3 Challenges</b> im nächtlichen Seilpark.<br>Erst dann gibt das Schloss die geheime PIN frei.</div>
   <div class="locks">🔒&nbsp;🔒&nbsp;🔒</div>
   <div class="tap-cta">TIPPEN ZUM STARTEN</div>
 </div>
@@ -92,9 +105,16 @@
   <div class="tap-cta">TIPPEN ZUM START</div>
 </div>
 
+<div id="done" class="overlay hidden">
+  <div class="check">✓</div>
+  <div class="dtitle">CHALLENGE 1<br>GESCHAFFT!</div>
+  <div class="locks" style="margin-top:20px;">🔓&nbsp;🔒&nbsp;🔒</div>
+  <div class="tap-cta">TIPPEN: NÄCHSTE CHALLENGE</div>
+</div>
+
 <div id="win" class="overlay hidden">
   <div class="won">ALLE 3 CHALLENGES<br>GESCHAFFT!</div>
-  <div class="lock">🔓 TRESOR ENTSPERRT</div>
+  <div class="lock">🔓 SCHLOSS ENTSPERRT</div>
   <div class="pin"><div class="d">3</div><div class="d">8</div><div class="d">7</div></div>
   <button class="btn" id="again">NOCHMAL</button>
 </div>
@@ -106,6 +126,7 @@
   const ctx = canvas.getContext("2d");
   const startEl = document.getElementById("start");
   const interEl = document.getElementById("inter");
+  const doneEl = document.getElementById("done");
   const winEl = document.getElementById("win");
   const againBtn = document.getElementById("again");
 
@@ -458,6 +479,13 @@
     challenges[i].reset();
     state = "play";
   }
+  function showDone(i){
+    doneEl.querySelector(".dtitle").innerHTML = "CHALLENGE " + (i + 1) + "<br>GESCHAFFT!";
+    const locks = ["🔒","🔒","🔒"]; for (let k = 0; k < doneCount; k++) locks[k] = "🔓";
+    doneEl.querySelector(".locks").innerHTML = locks.join("&nbsp;");
+    doneEl.classList.remove("hidden");
+    state = "done";
+  }
   function finishChallenge(){
     doneCount = current + 1;
     sfxGood();
@@ -466,8 +494,7 @@
       sfxWin();
       setTimeout(() => winEl.classList.remove("hidden"), 350);
     } else {
-      setTimeout(() => showIntro(current + 1), 150);
-      state = "between";
+      showDone(current);
     }
   }
   function restartAll(){
@@ -486,6 +513,7 @@
     ensureAudio();
     if (state === "start") { startEl.classList.add("hidden"); showIntro(0); return; }
     if (state === "intro") { startChallenge(current); return; }
+    if (state === "done") { doneEl.classList.add("hidden"); showIntro(current + 1); return; }
     if (state === "play") { challenges[current].tap(pointerX(e)); return; }
   });
   window.addEventListener("keydown", (e) => {
