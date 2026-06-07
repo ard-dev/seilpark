@@ -293,18 +293,18 @@
     reset(){ this.tilt = 0; this.tv = 0; this.prog = 0; this.windT = Math.random()*99; this.flash = 0; },
     tap(x){
       const dir = x < VW/2 ? -1 : 1;   // push Marlo toward that side
-      this.tv += dir * 0.012;
+      this.tv += dir * 0.013;
       beep(dir < 0 ? 500 : 560, 0.05, "square", 0.04);
     },
-    fail(){ sfxFail(); this.tilt = 0; this.tv = 0; this.prog = Math.max(0, this.prog - 0.18); this.flash = 45; },
+    fail(){ sfxFail(); this.tilt = 0; this.tv = 0; this.prog = Math.max(0, this.prog - 0.12); this.flash = 45; },
     update(){
       if (this.flash > 0) this.flash--;
       this.windT += 0.02;
       const gust = (Math.sin(this.windT) + Math.sin(this.windT*2.3+1))*0.5; // -1..1-ish
-      const windScale = 0.0011 * (0.5 + this.prog);     // stronger near the end
+      const windScale = 0.0006 * (0.4 + 0.5*this.prog); // milder, grows only gently
       this.tv += gust * windScale;
-      this.tv += this.tilt * 0.0016;                    // inverted-pendulum instability
-      this.tv *= 0.99;
+      this.tv += -this.tilt * 0.0008;                   // gentle self-centering (forgiving)
+      this.tv *= 0.985;
       this.tilt += this.tv;
       if (Math.abs(this.tilt) >= 1) this.fail();
       this.prog += 1/780;                                // ~13 s to cross
